@@ -13,9 +13,7 @@ const appState = {
   isAnnualBilling: false,
   selectedPlan: 'Premium',
   selectedPrice: 14.99,
-  speechSynth: window.speechSynthesis,
-  audioCtx: null,
-  ambientOscillators: []
+  speechSynth: window.speechSynthesis
 };
 
 // Multilingual Dictionary (RU, EN, HE)
@@ -57,7 +55,7 @@ const i18n = {
     btn_gen_emergency: "✨ Сгенерировать экспресс-аудио",
     tag_studio: "Студия Медитации",
     title_studio: "Создайте Персональный Рассказ-Медитацию",
-    sub_studio: "Низкий мужской тембр + Интеграция Образа/Героя + Очень тихий эмбиент + Паузы x2",
+    sub_studio: "Очень медленная озвучка низким мужским голосом (чистый голос без музыки)",
     btn_generate: "✨ Сгенерировать и озвучить рассказ-медитацию",
     tag_pricing: "Прозрачная монетизация",
     title_pricing: "Выберите Тариф Подписки",
@@ -106,7 +104,7 @@ const i18n = {
     btn_gen_emergency: "✨ Generate Express Audio",
     tag_studio: "Meditation Studio",
     title_studio: "Create Personal Narrative Meditation",
-    sub_studio: "Deep Male Voice + Active Hero Role + Very Quiet Ambient + x2 Pauses",
+    sub_studio: "Very Slow Deep Male Voice • Pure Speech Without Music",
     btn_generate: "✨ Generate & Speak Narrative Meditation",
     tag_pricing: "Transparent Pricing",
     title_pricing: "Select Subscription Plan",
@@ -155,7 +153,7 @@ const i18n = {
     btn_gen_emergency: "✨ צור שמע מהיר",
     tag_studio: "סטודיו מדיטציה",
     title_studio: "צור סיפור-מדיטציה אישי",
-    sub_studio: "קול גברי נמוך + שילוב תפקיד הגיבור + מוזיקת אמביינט שקטה",
+    sub_studio: "קול גברי נמוך ואיטי מאוד • דיבור נקי ללא מוזיקה",
     btn_generate: "✨ צור והקרא סיפור-מדיטציה",
     tag_pricing: "תמחור שקוף",
     title_pricing: "בחר תוכנית מנוי",
@@ -169,18 +167,18 @@ const i18n = {
   }
 };
 
-// Base Meditation Master Template — Guided Narrative Meditation
+// Base Meditation Master Template — Pure Guided Narrative Meditation (No forced hero)
 const BASE_MEDITATION_TEMPLATE = `
-Закрой глаза и обрати внимание на свой нос. Найди его, не открывая глаз. Почувствуй его мысленно... (Дыши спокойно и ровно, сосредоточься на ощущении воздуха у ноздрей)...
-А теперь обрати внимание на свои уши... Найди их, мысленно их ощути. Побудь с ними... (Почувствуй их тепло и мысленно представь их форму)...
-А теперь обрати внимание на пространство между своими ушами внутри своей головы... вот на это пространство. Почувствуй его, наблюдая за ним... (Представь внутри головы тихую, темную и спокойную пустоту)...
+Закрой глаза и обрати внимание на свой нос. Найди его, не открывая глаз. Почувствуй его мысленно...
+А теперь обрати внимание на свои уши... Найди их, мысленно их ощути. Побудь с ними...
+А теперь обрати внимание на пространство между своими ушами внутри своей головы... вот на это пространство. Почувствуй его, наблюдая за ним...
 А теперь обрати внимание на пространство вокруг всей своей головы... Ощути его мыслями, понаблюдай за ним...
-А теперь давай отправимся в бережный рассказ-медитацию... Представь, что ты — {HERO} по имени {NAME}...
-В этом месте ты, как {HERO}, чувствуешь абсолютную силу, покой и защищенность... Всё, во что веришь ты как {HERO} {NAME} — сбывается легко и наполняет сердце радостью...
-Поверь в то, что {NAME} — очень умн{GENDER_ADJ} {HERO}, и ооочень быстро и легко учишься... Поверь в это, и всё сбудется...
+А теперь давай отправимся в бережный рассказ-медитацию... {HERO_TEXT}
+В этом тихом пространстве ты, {NAME}, чувствуешь абсолютную силу, покой и защищенность... Всё, о чем ты мечтаешь — сбывается легко и наполняет сердце теплотой...
+Поверь в то, что ты, {NAME}, очень умн{GENDER_ADJ}, и ооочень быстро и легко учишься... Поверь в это, и всё сбудется...
 Поверь в то, что тебя очень сильно любят, и почувствуй это всем своим сердцем...
-Поверь в то, что как {HERO}, ты всегда под невидимой защитой, а все неприятности и страхи растают, как снег под жаркими лучами солнца...
-Ты — настоящая волшебная сила своей жизни. Помни: {HERO} {NAME}, ты важен, ты любим, ты особенный, и в тебе есть великая сила!
+Поверь в то, что ты всегда под невидимой защитой, а все неприятности и страхи растают, как снег под жаркими лучами солнца...
+Ты — настоящая волшебная сила своей жизни. Помни: {NAME}, ты важен, ты любим, ты особенный, и в тебе есть великая сила!
 Сделай глубокий выдох... улыбнись жизни, и она улыбнется тебе в ответ...
 `;
 
@@ -258,12 +256,11 @@ function closeEmergencyPanel() {
 function generateEmergencyAudio() {
   const contextInput = document.getElementById('emergency-context').value || "Ребенок растревожен и не может успокоиться";
   const name = document.getElementById('child-name').value || "Ребенок";
-  const hero = document.getElementById('child-hero').value || "Смелый человек";
 
   const emergencyScript = `
-    ${name}, наш ${hero}, сделай глубокий выдох вместе со мной... 1... 2... 3... 
+    ${name}, сделай глубокий выдох вместе со мной... Один... два... три... 
     Я знаю, что ситуация: "${contextInput}" вызывает много эмоций. 
-    Но как ${hero}, ты находишься в полной безопасности. 
+    Но сейчас ты находишься в полной безопасности. 
     Почувствуй, как мягкая волна покоя наполняет твое тело. Ты сильный, ты любимый, ты справишься.
   `;
 
@@ -288,7 +285,7 @@ function toggleVoiceRecord() {
     setTimeout(() => {
       if (appState.isRecording) {
         toggleVoiceRecord();
-        alert("Голос записан! ИИ проанализировал тембр. Сгенерирован персональный рассказ-медитация низким мужским тембром с очень тихим фоновым эмбиентом.");
+        alert("Голос записан! ИИ проанализировал тембр. Сгенерирован персональный рассказ-медитация очень медленным мужским голосом.");
       }
     }, 4000);
   } else {
@@ -301,169 +298,88 @@ function toggleVoiceRecord() {
   logClickAnalytics('VoiceRecord_Toggled', appState.isRecording ? 'Start' : 'Stop', 0);
 }
 
-// Web Audio API — VERY QUIET Meditative Floating Ambient (432Hz Binaural Pad)
-function startAmbientMusic() {
-  stopAmbientMusic(); // Clear any existing
-
-  try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    appState.audioCtx = new AudioCtx();
-
-    // VERY QUIET GAIN (0.015) so the male reading voice dominates 100%
-    const masterGain = appState.audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0.018, appState.audioCtx.currentTime);
-
-    const filter = appState.audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(220, appState.audioCtx.currentTime); // Soft low-pass pad
-
-    filter.connect(masterGain);
-    masterGain.connect(appState.audioCtx.destination);
-
-    // 432 Hz Solfeggio Harmonic Drone Frequencies
-    const frequencies = [108, 216, 432];
-
-    frequencies.forEach(freq => {
-      const osc = appState.audioCtx.createOscillator();
-      const oscGain = appState.audioCtx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, appState.audioCtx.currentTime);
-
-      const lfo = appState.audioCtx.createOscillator();
-      lfo.frequency.setValueAtTime(0.08, appState.audioCtx.currentTime); // Slow 12s cycle
-      const lfoGain = appState.audioCtx.createGain();
-      lfoGain.gain.setValueAtTime(0.005, appState.audioCtx.currentTime);
-
-      lfo.connect(oscGain.gain);
-      osc.connect(oscGain);
-      oscGain.connect(filter);
-
-      osc.start();
-      lfo.start();
-
-      appState.ambientOscillators.push(osc, lfo);
-    });
-
-    console.log("🎵 [Web Audio API] Very Quiet Meditative Ambient (432Hz) Started");
-  } catch (err) {
-    console.warn("Ambient Web Audio API notice:", err);
-  }
-}
-
-function stopAmbientMusic() {
-  if (appState.ambientOscillators.length > 0) {
-    appState.ambientOscillators.forEach(osc => {
-      try { osc.stop(); } catch(e){}
-    });
-    appState.ambientOscillators = [];
-  }
-  if (appState.audioCtx) {
-    try { appState.audioCtx.close(); } catch(e){}
-    appState.audioCtx = null;
-  }
-}
-
 // Generate Personal Meditation Text & Audio
 function generatePersonalMeditation() {
   const name = document.getElementById('child-name').value || "Ребенок";
   const gender = document.getElementById('child-gender').value;
-  const hero = document.getElementById('child-hero').value || "Смелый и уверенный человек";
+  const hero = document.getElementById('child-hero').value.trim();
   const mode = document.getElementById('meditation-type').value;
 
   const genderEnd = (gender === 'girl') ? 'а' : '';
   const genderAdj = (gender === 'girl') ? 'ая' : 'ый';
 
+  const heroText = hero ? `Представь, что ты — ${hero}...` : `Представь себя в удивительном месте покоя...`;
+
   let customText = BASE_MEDITATION_TEMPLATE
     .replace(/{NAME}/g, name)
-    .replace(/{HERO}/g, hero)
+    .replace(/{HERO_TEXT}/g, heroText)
     .replace(/{GENDER_END}/g, genderEnd)
     .replace(/{GENDER_ADJ}/g, genderAdj);
 
   if (mode === 'morning') {
-    customText = `☀️ УТРЕННИЙ РАССКАЗ-МЕДИТАЦИЯ ДЛЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
+    customText = `☀️ УТРЕННИЙ РАССКАЗ-МЕДИТАЦИЯ ДЛЯ ${name.toUpperCase()}:\n\n` + customText;
   } else if (mode === 'emergency') {
-    customText = `🚨 ЭКСТРЕННОЕ ЗАЗЕМЛЕНИЕ ДЛЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
+    customText = `🚨 ЭКСТРЕННОЕ ЗАЗЕМЛЕНИЕ ДЛЯ ${name.toUpperCase()}:\n\n` + customText;
   } else {
-    customText = `🌙 СОННЫЙ РАССКАЗ-МЕДИТАЦИЯ ДЛЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
+    customText = `🌙 СОННЫЙ РАССКАЗ-МЕДИТАЦИЯ ДЛЯ ${name.toUpperCase()}:\n\n` + customText;
   }
 
   document.getElementById('meditation-text-box').innerText = customText;
-  document.getElementById('player-title').innerText = `${name} — ${hero}`;
+  document.getElementById('player-title').innerText = `${name} — Рассказ-Медитация`;
   
   speakTextWithTunedVoice(customText);
 
-  logClickAnalytics('Meditation_Generated', `${mode}_${name}_${hero}`, 0);
+  logClickAnalytics('Meditation_Generated', `${mode}_${name}`, 0);
 }
 
-// Native SpeechSynthesis (DEEP MALE VOICE + 0.4 PITCH + 0.5 RATE + x2 PAUSES)
+// Native SpeechSynthesis — VERY SLOW DEEP MALE VOICE (PURE SPEECH, NO MUSIC, ORIGINAL FLOW)
 function speakTextWithTunedVoice(text) {
   if (!appState.speechSynth) {
     alert("Ваш браузер не поддерживает встроенный синтез речи.");
     return;
   }
 
-  appState.speechSynth.cancel();
+  appState.speechSynth.cancel(); // Stop any active speech
 
-  const isAmbientEnabled = document.getElementById('ambient-music-toggle').checked;
-  if (isAmbientEnabled) {
-    startAmbientMusic();
-  } else {
-    stopAmbientMusic();
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // VERY SLOW, MEDITATIVE MALE VOICE SETTINGS (ORIGINAL SMOOTH ENGINE)
+  utterance.rate = 0.65; // Very slow, calm reading pace
+  utterance.pitch = 0.75; // Calm, low male pitch
+
+  // Select Male Voice
+  const voices = appState.speechSynth.getVoices();
+  const maleVoice = voices.find(v => (
+    v.name.includes('Male') || 
+    v.name.includes('Pavel') || 
+    v.name.includes('Dmitry') || 
+    v.name.includes('Google русский') || 
+    v.name.includes('David') || 
+    v.name.includes('George')
+  ));
+
+  if (maleVoice) {
+    utterance.voice = maleVoice;
   }
 
-  const sentences = text.split(/(?<=[.!?])\s+/);
-  let currentIndex = 0;
+  utterance.onstart = () => {
+    appState.isPlayingAudio = true;
+    document.getElementById('play-btn').innerText = "⏸";
+    document.getElementById('player-progress').style.width = "30%";
+  };
 
-  function speakNextSentence() {
-    if (currentIndex >= sentences.length) {
-      appState.isPlayingAudio = false;
-      document.getElementById('play-btn').innerText = "▶";
-      document.getElementById('player-progress').style.width = "100%";
-      stopAmbientMusic();
-      return;
-    }
+  utterance.onend = () => {
+    appState.isPlayingAudio = false;
+    document.getElementById('play-btn').innerText = "▶";
+    document.getElementById('player-progress').style.width = "100%";
+  };
 
-    const sentence = sentences[currentIndex];
-    if (!sentence.trim()) {
-      currentIndex++;
-      speakNextSentence();
-      return;
-    }
+  utterance.onerror = () => {
+    appState.isPlayingAudio = false;
+    document.getElementById('play-btn').innerText = "▶";
+  };
 
-    const utterance = new SpeechSynthesisUtterance(sentence);
-
-    utterance.rate = 0.5; // Slow pace
-    utterance.pitch = 0.4; // Extremely deep male pitch
-
-    const voices = appState.speechSynth.getVoices();
-    const maleVoice = voices.find(v => (v.name.includes('Male') || v.name.includes('Pavel') || v.name.includes('Dmitry') || v.name.includes('Google русский') || v.name.includes('David') || v.name.includes('George')));
-    if (maleVoice) {
-      utterance.voice = maleVoice;
-    }
-
-    utterance.onstart = () => {
-      appState.isPlayingAudio = true;
-      document.getElementById('play-btn').innerText = "⏸";
-      const progress = Math.round((currentIndex / sentences.length) * 100);
-      document.getElementById('player-progress').style.width = `${progress}%`;
-    };
-
-    utterance.onend = () => {
-      currentIndex++;
-      // Extended x2 Pause (2000ms delay)
-      setTimeout(speakNextSentence, 2000);
-    };
-
-    utterance.onerror = () => {
-      currentIndex++;
-      speakNextSentence();
-    };
-
-    appState.speechSynth.speak(utterance);
-  }
-
-  speakNextSentence();
+  appState.speechSynth.speak(utterance);
 }
 
 function togglePlayAudio() {
@@ -471,7 +387,6 @@ function togglePlayAudio() {
 
   if (appState.speechSynth.speaking) {
     appState.speechSynth.cancel();
-    stopAmbientMusic();
     appState.isPlayingAudio = false;
     document.getElementById('play-btn').innerText = "▶";
   } else {
