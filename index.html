@@ -95,7 +95,7 @@
             <div class="avatar">🤖</div>
             <div class="card-info">
               <h4>MindEcho Supervisor AI</h4>
-              <p>Медитация перед сном • Низкий тембр</p>
+              <p>Очень низкий мужской тембр • Эмбиент фоновая музыка • Паузы x2</p>
             </div>
             <span class="live-tag">LIVE</span>
           </div>
@@ -103,10 +103,10 @@
             <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
           </div>
           <p class="sample-quote">
-            "Закрой глаза и обрати внимание на свой нос... Почувствуй тихую и спокойную радость внутри..."
+            "Закрой глаза и обрати внимание на свой нос... Почувствуй, как великий герой наполняется абсолютным покоем..."
           </p>
           <div class="card-footer">
-            <span>✨ Персонализировано под ребенка</span>
+            <span>✨ Активная интеграция героя ребенка</span>
             <button class="btn-icon" onclick="scrollToSection('generator')">▶</button>
           </div>
         </div>
@@ -251,7 +251,7 @@
       <div class="section-header text-center">
         <span class="section-tag" data-i18n="tag_studio">Студия Сказкотерапии</span>
         <h2 class="section-title" data-i18n="title_studio">Создайте Персональную Медитацию</h2>
-        <p class="section-subtitle" data-i18n="sub_studio">Голосовая запись + Настройка имени, героя и успокаивающего голоса</p>
+        <p class="section-subtitle" data-i18n="sub_studio">Низкий мужской тембр + Ролевая интеграция Героя + Плавающий эмбиент + Паузы x2</p>
       </div>
 
       <div class="generator-layout glass-card">
@@ -292,31 +292,37 @@
               <input type="number" id="child-age" value="6" min="1" max="16" class="form-input">
             </div>
             <div class="form-group">
-              <label for="child-hero">Кем хочет быть (Герой):</label>
-              <input type="text" id="child-hero" value="Доброй волшебницей" class="form-input">
+              <label for="child-hero">Кем хочет быть ребенок (Герой / Персонаж):</label>
+              <input type="text" id="child-hero" value="Смелым Рыцарем Света" class="form-input" placeholder="Например: Волшебница, Супергерой, Космонавт">
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="voice-timbre">Тембр голоса озвучки:</label>
+              <label for="voice-timbre">Тембр и Голос озвучки:</label>
               <select id="voice-timbre" class="form-select">
-                <option value="male_deep">Мужской — очень низкий, медленный</option>
-                <option value="female_soft">Женский — бережный, спокойный</option>
+                <option value="male_deep">🎙 Мужской — Ультра-низкий, глубокий бархатный тембр</option>
               </select>
             </div>
             <div class="form-group">
               <label for="meditation-type">Режим медитации:</label>
               <select id="meditation-type" class="form-select">
-                <option value="bedtime">🌙 Перед сном (Засыпание)</option>
-                <option value="morning">☀️ Утренняя (Уверенность)</option>
+                <option value="bedtime">🌙 Перед сном (Засыпание & Паузы x2)</option>
+                <option value="morning">☀️ Утренняя (Уверенность Героя)</option>
                 <option value="emergency">🚨 Экстренная (Заземление)</option>
               </select>
             </div>
           </div>
 
+          <div class="form-group ambient-toggle-box">
+            <label class="checkbox-label">
+              <input type="checkbox" id="ambient-music-toggle" checked>
+              <span>🎵 Воспроизводить медитативную фоновую музыку (Плавающий Эмбиент 432 Гц)</span>
+            </label>
+          </div>
+
           <button class="btn btn-primary btn-block btn-lg btn-orange" onclick="generatePersonalMeditation()" data-i18n="btn_generate">
-            ✨ Сгенерировать и озвучить медитацию
+            ✨ Сгенерировать и озвучить медитацию (Мужской тембр + Эмбиент)
           </button>
         </div>
 
@@ -326,13 +332,13 @@
             <div class="player-header">
               <div class="disc-spin">✨</div>
               <div>
-                <h4 id="player-title">Медитация для Софии</h4>
-                <p id="player-subtitle">Низкий тембр • Паузы 1.5x • Успокаивающий тон</p>
+                <h4 id="player-title">Медитация для Героя</h4>
+                <p id="player-subtitle">Низкий мужской голос • Плавающий Эмбиент 432Гц • Паузы x2</p>
               </div>
             </div>
 
             <div class="text-preview-scroll" id="meditation-text-box">
-              <p class="placeholder-text">Нажмите "Сгенерировать", чтобы создать индивидуальную медитацию с замедленным низким тембром и увеличенными паузами...</p>
+              <p class="placeholder-text">Укажите имя и кем хочет быть ваш ребенок (Герой), затем нажмите "Сгенерировать"...</p>
             </div>
 
             <div class="player-controls">
@@ -378,7 +384,7 @@
           <ul class="plan-features">
             <li>✅ 2 AI-запроса в день</li>
             <li>✅ Стандартные шаблоны медитаций</li>
-            <li>✅ Озвучка браузерным синтезом</li>
+            <li>✅ Озвучка низким мужским тембром</li>
             <li>❌ Нет сохранения истории</li>
           </ul>
           <button class="btn btn-secondary btn-block" onclick="selectPlan('Free', 0)" data-i18n="btn_plan_free">Начать бесплатно</button>
@@ -393,9 +399,9 @@
           </div>
           <ul class="plan-features">
             <li>✅ 50 минут генераций в месяц</li>
-            <li>✅ Персонализация под имя и героя</li>
+            <li>✅ Ролевая интеграция имени и героя</li>
             <li>✅ Поддержка 3 языков (RU, EN, HE)</li>
-            <li>✅ Запись голоса в Google Таблицы</li>
+            <li>✅ Запись кликов в Google Таблицы</li>
           </ul>
           <button class="btn btn-outline btn-block" onclick="selectPlan('Basic', 7)" data-i18n="btn_plan_basic">Выбрать Базовый</button>
         </div>
@@ -411,9 +417,9 @@
           </div>
           <ul class="plan-features">
             <li>✅ 120 минут генераций (~12 медитаций)</li>
-            <li>✅ Доступ к библиотеке частот и музыки</li>
+            <li>✅ Плавающий медитативный эмбиент 432 Гц</li>
             <li>✅ Экстренная помощь при истерике</li>
-            <li>✅ Низкий замедленный тембр озвучки</li>
+            <li>✅ Низкий мужской тембр с паузами x2</li>
             <li>✅ Приоритетная поддержка</li>
           </ul>
           <button class="btn btn-primary btn-block btn-orange" onclick="selectPlan('Premium', 14.99)" data-i18n="btn_plan_premium">Активировать Премиум</button>
