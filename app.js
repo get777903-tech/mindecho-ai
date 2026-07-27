@@ -44,7 +44,7 @@ const i18n = {
     m4_desc: "Превентивно и мягко исцеляем дневные стрессы, обиды и страхи ребенка прямо в процессе засыпания, программируя на уверенность.",
     tag_modes: "Быстрый запуск",
     title_modes: "3 Входных Аудиорежима Терапии",
-    sub_modes: "Выберите требуемый сценарий для мгновенной генерации медитации или помощи",
+    sub_modes: "Выберите требуемый сценарий для мгновенной генерации рассказа-медитации или помощи",
     mode_morning_title: "Утренняя медитация",
     mode_morning_desc: "Заряд бодрости, веры в свои силы, лёгкости в учебе и радости перед новым днем.",
     btn_start_morning: "Запустить утренний настрой",
@@ -55,10 +55,10 @@ const i18n = {
     mode_emergency_desc: "Мгновенный 4-шаговый алгоритм для родителя + экспресс-генерация аудио для заземления ребенка.",
     btn_start_emergency: "🚨 Активировать скорую помощь",
     btn_gen_emergency: "✨ Сгенерировать экспресс-аудио",
-    tag_studio: "Студия Сказкотерапии",
-    title_studio: "Создайте Персональную Медитацию",
-    sub_studio: "Низкий мужской тембр + Ролевая интеграция Героя + Эмбиент + Паузы x2",
-    btn_generate: "✨ Сгенерировать и озвучить медитацию (Мужской тембр + Эмбиент)",
+    tag_studio: "Студия Медитации",
+    title_studio: "Создайте Персональный Рассказ-Медитацию",
+    sub_studio: "Низкий мужской тембр + Интеграция Образа/Героя + Очень тихий эмбиент + Паузы x2",
+    btn_generate: "✨ Сгенерировать и озвучить рассказ-медитацию",
     tag_pricing: "Прозрачная монетизация",
     title_pricing: "Выберите Тариф Подписки",
     sub_pricing: "Freemium доступ + Лимиты генерации + Докупка минут",
@@ -93,7 +93,7 @@ const i18n = {
     m4_desc: "Gently healing daytime stress and fears right during sleep transition, programming confidence.",
     tag_modes: "Quick Launch",
     title_modes: "3 Core Audio Therapy Modes",
-    sub_modes: "Select a scenario for instant personalized meditation or emergency relief",
+    sub_modes: "Select a scenario for instant personalized narrative meditation or emergency relief",
     mode_morning_title: "Morning Meditation",
     mode_morning_desc: "Boost of energy, self-belief, learning ease, and joy for the new day.",
     btn_start_morning: "Start Morning Vibe",
@@ -104,10 +104,10 @@ const i18n = {
     mode_emergency_desc: "Instant 4-step algorithm for parents + express audio for child grounding.",
     btn_start_emergency: "🚨 Activate Emergency Relief",
     btn_gen_emergency: "✨ Generate Express Audio",
-    tag_studio: "Story Therapy Studio",
-    title_studio: "Create Personal Meditation",
-    sub_studio: "Deep Male Voice + Active Hero Role + Ambient Music + x2 Pauses",
-    btn_generate: "✨ Generate & Speak Meditation (Deep Male + Ambient)",
+    tag_studio: "Meditation Studio",
+    title_studio: "Create Personal Narrative Meditation",
+    sub_studio: "Deep Male Voice + Active Hero Role + Very Quiet Ambient + x2 Pauses",
+    btn_generate: "✨ Generate & Speak Narrative Meditation",
     tag_pricing: "Transparent Pricing",
     title_pricing: "Select Subscription Plan",
     sub_pricing: "Freemium access + Generation credits + Top-up minutes",
@@ -153,10 +153,10 @@ const i18n = {
     mode_emergency_desc: "אלגוריתם מיידי של 4 שלבים להורה + שמע מהיר לקרקוע הילד.",
     btn_start_emergency: "🚨 הפעל עזרה דחופה",
     btn_gen_emergency: "✨ צור שמע מהיר",
-    tag_studio: "סטודיו לריפוי בסיפורים",
-    title_studio: "צור מדיטציה אישית",
-    sub_studio: "קול גברי נמוך + שילוב תפקיד הגיבור + מוזיקת אמביינט",
-    btn_generate: "✨ צור והקרא מדיטציה",
+    tag_studio: "סטודיו מדיטציה",
+    title_studio: "צור סיפור-מדיטציה אישי",
+    sub_studio: "קול גברי נמוך + שילוב תפקיד הגיבור + מוזיקת אמביינט שקטה",
+    btn_generate: "✨ צור והקרא סיפור-מדיטציה",
     tag_pricing: "תמחור שקוף",
     title_pricing: "בחר תוכנית מנוי",
     sub_pricing: "גישת Freemium + קרדיטים ליצירה",
@@ -169,14 +169,14 @@ const i18n = {
   }
 };
 
-// Base Meditation Template with ACTIVE HERO integration
+// Base Meditation Master Template — Guided Narrative Meditation
 const BASE_MEDITATION_TEMPLATE = `
 Закрой глаза и обрати внимание на свой нос. Найди его, не открывая глаз. Почувствуй его мысленно... (Дыши спокойно и ровно, сосредоточься на ощущении воздуха у ноздрей)...
 А теперь обрати внимание на свои уши... Найди их, мысленно их ощути. Побудь с ними... (Почувствуй их тепло и мысленно представь их форму)...
 А теперь обрати внимание на пространство между своими ушами внутри своей головы... вот на это пространство. Почувствуй его, наблюдая за ним... (Представь внутри головы тихую, темную и спокойную пустоту)...
 А теперь обрати внимание на пространство вокруг всей своей головы... Ощути его мыслями, понаблюдай за ним...
-А теперь давай отправимся в дружелюбное волшебное местечко... Представь, что ты — великий и смелый {HERO} по имени {NAME}...
-В этом мире ты, как настоящий {HERO}, чувствуешь абсолютную силу, покой и защищенность... Всё, во что верит {HERO} {NAME} — сбывается легко и быстро...
+А теперь давай отправимся в бережный рассказ-медитацию... Представь, что ты — {HERO} по имени {NAME}...
+В этом месте ты, как {HERO}, чувствуешь абсолютную силу, покой и защищенность... Всё, во что веришь ты как {HERO} {NAME} — сбывается легко и наполняет сердце радостью...
 Поверь в то, что {NAME} — очень умн{GENDER_ADJ} {HERO}, и ооочень быстро и легко учишься... Поверь в это, и всё сбудется...
 Поверь в то, что тебя очень сильно любят, и почувствуй это всем своим сердцем...
 Поверь в то, что как {HERO}, ты всегда под невидимой защитой, а все неприятности и страхи растают, как снег под жаркими лучами солнца...
@@ -258,16 +258,16 @@ function closeEmergencyPanel() {
 function generateEmergencyAudio() {
   const contextInput = document.getElementById('emergency-context').value || "Ребенок растревожен и не может успокоиться";
   const name = document.getElementById('child-name').value || "Ребенок";
-  const hero = document.getElementById('child-hero').value || "Смелый Герой";
+  const hero = document.getElementById('child-hero').value || "Смелый человек";
 
   const emergencyScript = `
-    ${name}, наш смелый ${hero}, сделай глубокий выдох вместе со мной... 1... 2... 3... 
-    Я знаю, что ситуация: "${contextInput}" вызывает эмоции. 
-    Но как настоящий ${hero}, ты находишься в полной безопасности. 
+    ${name}, наш ${hero}, сделай глубокий выдох вместе со мной... 1... 2... 3... 
+    Я знаю, что ситуация: "${contextInput}" вызывает много эмоций. 
+    Но как ${hero}, ты находишься в полной безопасности. 
     Почувствуй, как мягкая волна покоя наполняет твое тело. Ты сильный, ты любимый, ты справишься.
   `;
 
-  document.getElementById('meditation-text-box').innerHTML = `<p><strong>🚨 ЭКСТРЕННОЕ АУДИО ДЛЯ ЗАЗЕМЛЕНИЯ ГЕРОЯ:</strong><br><br>${emergencyScript}</p>`;
+  document.getElementById('meditation-text-box').innerHTML = `<p><strong>🚨 ЭКСТРЕННОЕ АУДИО ЗАЗЕМЛЕНИЯ:</strong><br><br>${emergencyScript}</p>`;
   speakTextWithTunedVoice(emergencyScript);
 
   logClickAnalytics('EmergencyAudio_Generated', contextInput, 0);
@@ -288,7 +288,7 @@ function toggleVoiceRecord() {
     setTimeout(() => {
       if (appState.isRecording) {
         toggleVoiceRecord();
-        alert("Голос записан! ИИ проанализировал тембр. Сгенерирована персональная аудио-медитация низким мужским тембром с фоновым эмбиентом.");
+        alert("Голос записан! ИИ проанализировал тембр. Сгенерирован персональный рассказ-медитация низким мужским тембром с очень тихим фоновым эмбиентом.");
       }
     }, 4000);
   } else {
@@ -301,7 +301,7 @@ function toggleVoiceRecord() {
   logClickAnalytics('VoiceRecord_Toggled', appState.isRecording ? 'Start' : 'Stop', 0);
 }
 
-// Web Audio API — Meditative Floating Ambient Generator (432Hz Binaural Pad)
+// Web Audio API — VERY QUIET Meditative Floating Ambient (432Hz Binaural Pad)
 function startAmbientMusic() {
   stopAmbientMusic(); // Clear any existing
 
@@ -309,18 +309,19 @@ function startAmbientMusic() {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     appState.audioCtx = new AudioCtx();
 
+    // VERY QUIET GAIN (0.015) so the male reading voice dominates 100%
     const masterGain = appState.audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0.08, appState.audioCtx.currentTime); // Soft volume
+    masterGain.gain.setValueAtTime(0.018, appState.audioCtx.currentTime);
 
     const filter = appState.audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(350, appState.audioCtx.currentTime); // Deep warm filter
+    filter.frequency.setValueAtTime(220, appState.audioCtx.currentTime); // Soft low-pass pad
 
     filter.connect(masterGain);
     masterGain.connect(appState.audioCtx.destination);
 
     // 432 Hz Solfeggio Harmonic Drone Frequencies
-    const frequencies = [108, 216, 432, 540];
+    const frequencies = [108, 216, 432];
 
     frequencies.forEach(freq => {
       const osc = appState.audioCtx.createOscillator();
@@ -329,11 +330,10 @@ function startAmbientMusic() {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, appState.audioCtx.currentTime);
 
-      // Slow LFO Floating Volume Pulsation
       const lfo = appState.audioCtx.createOscillator();
-      lfo.frequency.setValueAtTime(0.1, appState.audioCtx.currentTime); // 10s cycle
+      lfo.frequency.setValueAtTime(0.08, appState.audioCtx.currentTime); // Slow 12s cycle
       const lfoGain = appState.audioCtx.createGain();
-      lfoGain.gain.setValueAtTime(0.03, appState.audioCtx.currentTime);
+      lfoGain.gain.setValueAtTime(0.005, appState.audioCtx.currentTime);
 
       lfo.connect(oscGain.gain);
       osc.connect(oscGain);
@@ -345,7 +345,7 @@ function startAmbientMusic() {
       appState.ambientOscillators.push(osc, lfo);
     });
 
-    console.log("🎵 [Web Audio API] Meditative Floating Ambient (432Hz) Started");
+    console.log("🎵 [Web Audio API] Very Quiet Meditative Ambient (432Hz) Started");
   } catch (err) {
     console.warn("Ambient Web Audio API notice:", err);
   }
@@ -368,7 +368,7 @@ function stopAmbientMusic() {
 function generatePersonalMeditation() {
   const name = document.getElementById('child-name').value || "Ребенок";
   const gender = document.getElementById('child-gender').value;
-  const hero = document.getElementById('child-hero').value || "Смелый Воин Света";
+  const hero = document.getElementById('child-hero').value || "Смелый и уверенный человек";
   const mode = document.getElementById('meditation-type').value;
 
   const genderEnd = (gender === 'girl') ? 'а' : '';
@@ -381,11 +381,11 @@ function generatePersonalMeditation() {
     .replace(/{GENDER_ADJ}/g, genderAdj);
 
   if (mode === 'morning') {
-    customText = `☀️ УТРЕННИЙ НАСТРОЙ ДЛЯ ГЕРОЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
+    customText = `☀️ УТРЕННИЙ РАССКАЗ-МЕДИТАЦИЯ ДЛЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
   } else if (mode === 'emergency') {
-    customText = `🚨 ЭКСТРЕННОЕ ЗАЗЕМЛЕРИЕ ДЛЯ ГЕРОЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
+    customText = `🚨 ЭКСТРЕННОЕ ЗАЗЕМЛЕНИЕ ДЛЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
   } else {
-    customText = `🌙 СОННАЯ ТЕРАПИЯ ДЛЯ ГЕРОЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
+    customText = `🌙 СОННЫЙ РАССКАЗ-МЕДИТАЦИЯ ДЛЯ ${name.toUpperCase()} (${hero.toUpperCase()}):\n\n` + customText;
   }
 
   document.getElementById('meditation-text-box').innerText = customText;
@@ -396,16 +396,15 @@ function generatePersonalMeditation() {
   logClickAnalytics('Meditation_Generated', `${mode}_${name}_${hero}`, 0);
 }
 
-// Native SpeechSynthesis (FORCED DEEP MALE VOICE + 0.4 PITCH + 0.5 RATE + x2 PAUSES)
+// Native SpeechSynthesis (DEEP MALE VOICE + 0.4 PITCH + 0.5 RATE + x2 PAUSES)
 function speakTextWithTunedVoice(text) {
   if (!appState.speechSynth) {
     alert("Ваш браузер не поддерживает встроенный синтез речи.");
     return;
   }
 
-  appState.speechSynth.cancel(); // Stop current
+  appState.speechSynth.cancel();
 
-  // Toggle Ambient Music if enabled
   const isAmbientEnabled = document.getElementById('ambient-music-toggle').checked;
   if (isAmbientEnabled) {
     startAmbientMusic();
@@ -413,7 +412,6 @@ function speakTextWithTunedVoice(text) {
     stopAmbientMusic();
   }
 
-  // Split text into sentences for x2 Extended Pauses
   const sentences = text.split(/(?<=[.!?])\s+/);
   let currentIndex = 0;
 
@@ -435,11 +433,9 @@ function speakTextWithTunedVoice(text) {
 
     const utterance = new SpeechSynthesisUtterance(sentence);
 
-    // FORCED DEEP MALE VOICE PARAMETERS
-    utterance.rate = 0.5; // Very slow, meditative pace
+    utterance.rate = 0.5; // Slow pace
     utterance.pitch = 0.4; // Extremely deep male pitch
 
-    // Select Male Voice from browser list
     const voices = appState.speechSynth.getVoices();
     const maleVoice = voices.find(v => (v.name.includes('Male') || v.name.includes('Pavel') || v.name.includes('Dmitry') || v.name.includes('Google русский') || v.name.includes('David') || v.name.includes('George')));
     if (maleVoice) {
@@ -455,7 +451,7 @@ function speakTextWithTunedVoice(text) {
 
     utterance.onend = () => {
       currentIndex++;
-      // Extended x2 Pause (2000ms delay between sentences)
+      // Extended x2 Pause (2000ms delay)
       setTimeout(speakNextSentence, 2000);
     };
 
