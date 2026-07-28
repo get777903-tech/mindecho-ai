@@ -1,41 +1,43 @@
 /**
  * ============================================================================
- * MindEcho AI — Google Apps Script for Google Sheets Logging Webhook
+ * MindEcho AI — Google Apps Script for User Registration & Click Tracking
  * ============================================================================
- * ИНСТРУКЦИЯ ПО НАСТРОЙКЕ:
- * 1. Откройте вашу Google Таблицу.
- * 2. Перейдите в меню: Расширения (Extensions) -> Apps Script.
- * 3. Вставьте этот код вместо стандартного.
- * 4. Нажмите "Развернуть" (Deploy) -> "Новое развертывание" (New deployment).
- * 5. Выберите тип: "Веб-приложение" (Web app).
- * 6. Права доступа (Who has access): "Все" (Anyone).
- * 7. Скопируйте полученный URL и вставьте в константу GOOGLE_SHEETS_WEBHOOK_URL в app.js!
+ * Автоматически сохраняет клики, тарифы и регистрацию (ID, Имя, Email, Телефон, Адрес)
+ * Авто-создание новой вкладки каждые 100 записей
  * ============================================================================
  */
 
-const MAX_ROWS_PER_SHEET = 100; // Автоматическое создание новой вкладки каждые 100 записей
+const MAX_ROWS = 100;
 
 function doPost(e) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = getOrCreateActiveSheet(ss);
+    let sheet = ss.getSheets()[ss.getSheets().length - 1];
 
-    // Parse JSON Payload from App
+    if (sheet.getLastRow() >= (MAX_ROWS + 1)) {
+      const nextBatch = ss.getSheets().length + 1;
+      sheet = ss.insertSheet(`Логи (Партия ${nextBatch})`);
+      createHeader(sheet);
+    } else if (sheet.getLastRow() === 0) {
+      createHeader(sheet);
+    }
+
     const data = JSON.parse(e.postData.contents);
 
-    // Prepare Row Data
-    const row = [
+    sheet.appendRow([
       data.timestamp || new Date().toLocaleString(),
-      data.event_type || 'Unknown',
-      data.plan_name || 'N/A',
+      data.event_type || 'Клик',
+      data.user_id || 'GUEST',
+      data.user_name || '-',
+      data.email || '-',
+      data.phone || '-',
+      data.address || '-',
+      data.auth_provider || '-',
+      data.plan_name || '-',
       data.price || 0,
       data.language || 'ru',
-      data.billing_cycle || 'Monthly',
-      data.phone || '',
-      data.user_agent || ''
-    ];
-
-    sheet.appendRow(row);
+      data.user_agent || '-'
+    ]);
 
     return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -46,45 +48,23 @@ function doPost(e) {
   }
 }
 
-/**
- * Проверяет количество строк в текущей вкладке.
- * Если >= 100 строк — создаёт новый лист (например, "Логи 101-200") и добавляет шапку!
- */
-function getOrCreateActiveSheet(ss) {
-  const sheets = ss.getSheets();
-  let currentSheet = sheets[sheets.length - 1]; // Берем последнюю активную вкладку
-
-  // Если в текущем листе уже 100+ записей (включая шапку)
-  if (currentSheet.getLastRow() >= (MAX_ROWS_PER_SHEET + 1)) {
-    const batchNumber = sheets.length + 1;
-    const newSheetName = `Логи (Партия ${batchNumber})`;
-    currentSheet = ss.insertSheet(newSheetName);
-    createHeaderRow(currentSheet);
-  } else if (currentSheet.getLastRow() === 0) {
-    createHeaderRow(currentSheet);
-  }
-
-  return currentSheet;
-}
-
-/**
- * Создает форматированную шапку таблицы
- */
-function createHeaderRow(sheet) {
+function createHeader(sheet) {
   const headers = [
     'Дата и Время', 
     'Тип События', 
-    'Название Тарифа / Контекст', 
+    'ID Пользователя', 
+    'Имя Пользователя', 
+    'Email / Логин', 
+    'Телефон', 
+    'Адрес / Локация', 
+    'Способ Входа (Google/Apple/Email)', 
+    'Тариф / Контекст', 
     'Цена ($)', 
     'Язык', 
-    'Период (Мес/Год)', 
-    'Телефон / Доп. Данные', 
     'Устройство (User Agent)'
   ];
 
   sheet.appendRow(headers);
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange.setBackground('#2563EB');
-  headerRange.setFontColor('#FFFFFF');
-  headerRange.setFontWeight('bold');
+  const range = sheet.getRange(1, 1, 1, headers.length);
+  range.setBackground('#2563EB').setFontColor('#FFFFFF').setFontWeight('bold');
 }
