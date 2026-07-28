@@ -1,24 +1,21 @@
 /**
  * ============================================================================
- * MindEcho AI 2026 — Google Apps Script с автоматической нумерацией вкладок
- * ============================================================================
- * Авто-создание НОВОЙ ВКЛАДКИ с цифрами каждые 100 строк!
- * Данные НИКОГДА не стерутся, каждая 100-ка сохраняется в отдельный лист:
- * - "100+ Записей (Партия 1)"
- * - "100+ Записей (Партия 2)"
- * - "100+ Записей (Партия 3)" ... и так далее.
+ * MindEcho AI 2026 — Google Apps Script (Привязан к вашей Google Таблице)
+ * ID Таблицы: 1Nk0lLgBdcVsuPtQch0mRHf81gpyUMz3zHYJROVcUNV4
  * ============================================================================
  */
 
+const SPREADSHEET_ID = "1Nk0lLgBdcVsuPtQch0mRHf81gpyUMz3zHYJROVcUNV4";
 const MAX_ROWS = 100; // Лимит строк на 1 вкладку
 
 function doPost(e) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    // Явная привязка к вашей Google Таблице по ID
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     let sheets = ss.getSheets();
     let currentSheet = sheets[sheets.length - 1];
 
-    // Если в текущем листе уже 100+ записей — авто-создаем НОВЫЙ ЛИСТ с нумерацией
+    // Если в текущей вкладке уже 100+ записей — создаем НОВУЮ ВКЛАДКУ с нумерацией
     if (currentSheet.getLastRow() >= (MAX_ROWS + 1)) {
       const batchNumber = sheets.length + 1;
       const newSheetName = `100+ Записей (Партия ${batchNumber})`;
