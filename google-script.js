@@ -1,31 +1,37 @@
 /**
  * ============================================================================
- * MindEcho AI — Google Apps Script for User Registration & Click Tracking
+ * MindEcho AI 2026 — Google Apps Script с автоматической нумерацией вкладок
  * ============================================================================
- * Автоматически сохраняет клики, тарифы и регистрацию (ID, Имя, Email, Телефон, Адрес)
- * Авто-создание новой вкладки каждые 100 записей
+ * Авто-создание НОВОЙ ВКЛАДКИ с цифрами каждые 100 строк!
+ * Данные НИКОГДА не стерутся, каждая 100-ка сохраняется в отдельный лист:
+ * - "100+ Записей (Партия 1)"
+ * - "100+ Записей (Партия 2)"
+ * - "100+ Записей (Партия 3)" ... и так далее.
  * ============================================================================
  */
 
-const MAX_ROWS = 100;
+const MAX_ROWS = 100; // Лимит строк на 1 вкладку
 
 function doPost(e) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheets()[ss.getSheets().length - 1];
+    let sheets = ss.getSheets();
+    let currentSheet = sheets[sheets.length - 1];
 
-    if (sheet.getLastRow() >= (MAX_ROWS + 1)) {
-      const nextBatch = ss.getSheets().length + 1;
-      sheet = ss.insertSheet(`Логи (Партия ${nextBatch})`);
-      createHeader(sheet);
-    } else if (sheet.getLastRow() === 0) {
-      createHeader(sheet);
+    // Если в текущем листе уже 100+ записей — авто-создаем НОВЫЙ ЛИСТ с нумерацией
+    if (currentSheet.getLastRow() >= (MAX_ROWS + 1)) {
+      const batchNumber = sheets.length + 1;
+      const newSheetName = `100+ Записей (Партия ${batchNumber})`;
+      currentSheet = ss.insertSheet(newSheetName);
+      createHeader(currentSheet);
+    } else if (currentSheet.getLastRow() === 0) {
+      createHeader(currentSheet);
     }
 
     const data = JSON.parse(e.postData.contents);
 
-    sheet.appendRow([
-      data.timestamp || new Date().toLocaleString(),
+    currentSheet.appendRow([
+      data.timestamp || new Date().toLocaleString('ru-RU'),
       data.event_type || 'Клик',
       data.user_id || 'GUEST',
       data.user_name || '-',
@@ -50,18 +56,9 @@ function doPost(e) {
 
 function createHeader(sheet) {
   const headers = [
-    'Дата и Время', 
-    'Тип События', 
-    'ID Пользователя', 
-    'Имя Пользователя', 
-    'Email / Логин', 
-    'Телефон', 
-    'Адрес / Локация', 
-    'Способ Входа (Google/Apple/Email)', 
-    'Тариф / Контекст', 
-    'Цена ($)', 
-    'Язык', 
-    'Устройство (User Agent)'
+    'Дата и Время', 'Тип События', 'ID Пользователя', 'Имя Пользователя', 
+    'Email / Логин', 'Телефон', 'Адрес / Локация', 'Способ Входа', 
+    'Тариф / Контекст', 'Цена ($)', 'Язык', 'Устройство'
   ];
 
   sheet.appendRow(headers);
