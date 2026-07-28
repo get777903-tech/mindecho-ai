@@ -5,6 +5,9 @@
 // Configurable Webhook URL for Google Sheets logging
 const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx_DEMO_MINDECHO_WEBHOOK/exec";
 
+// Audio Track File Name
+const MEDITATION_AUDIO_SRC = "meditation1.mp3";
+
 // Global Application State
 const appState = {
   lang: 'ru',
@@ -13,7 +16,7 @@ const appState = {
   isAnnualBilling: false,
   selectedPlan: 'Premium',
   selectedPrice: 14.99,
-  speechSynth: window.speechSynthesis
+  audioTrack: null
 };
 
 // Multilingual Dictionary (RU, EN, HE)
@@ -54,9 +57,9 @@ const i18n = {
     btn_start_emergency: "🚨 Активировать скорую помощь",
     btn_gen_emergency: "✨ Сгенерировать экспресс-аудио",
     tag_studio: "Студия Медитации",
-    title_studio: "Создайте Персональный Рассказ-Медитацию",
-    sub_studio: "Очень медленная озвучка низким мужским голосом (чистый голос без музыки)",
-    btn_generate: "✨ Сгенерировать и озвучить рассказ-медитацию",
+    title_studio: "Персональный Рассказ-Медитация",
+    sub_studio: "Студийная фонограмма высокого качества (MP3)",
+    btn_generate: "✨ Запустить рассказ-медитацию (MP3)",
     tag_pricing: "Прозрачная монетизация",
     title_pricing: "Выберите Тариф Подписки",
     sub_pricing: "Freemium доступ + Лимиты генерации + Докупка минут",
@@ -103,9 +106,9 @@ const i18n = {
     btn_start_emergency: "🚨 Activate Emergency Relief",
     btn_gen_emergency: "✨ Generate Express Audio",
     tag_studio: "Meditation Studio",
-    title_studio: "Create Personal Narrative Meditation",
-    sub_studio: "Very Slow Deep Male Voice • Pure Speech Without Music",
-    btn_generate: "✨ Generate & Speak Narrative Meditation",
+    title_studio: "Personal Narrative Meditation",
+    sub_studio: "Studio Quality MP3 Audio Track",
+    btn_generate: "✨ Play Narrative Meditation (MP3)",
     tag_pricing: "Transparent Pricing",
     title_pricing: "Select Subscription Plan",
     sub_pricing: "Freemium access + Generation credits + Top-up minutes",
@@ -152,9 +155,9 @@ const i18n = {
     btn_start_emergency: "🚨 הפעל עזרה דחופה",
     btn_gen_emergency: "✨ צור שמע מהיר",
     tag_studio: "סטודיו מדיטציה",
-    title_studio: "צור סיפור-מדיטציה אישי",
-    sub_studio: "קול גברי נמוך ואיטי מאוד • דיבור נקי ללא מוזיקה",
-    btn_generate: "✨ צור והקרא סיפור-מדיטציה",
+    title_studio: "סיפור-מדיטציה אישי",
+    sub_studio: "הקלטת MP3 באיכות אולפן",
+    btn_generate: "✨ נגן סיפור-מדיטציה (MP3)",
     tag_pricing: "תמחור שקוף",
     title_pricing: "בחר תוכנית מנוי",
     sub_pricing: "גישת Freemium + קרדיטים ליצירה",
@@ -167,7 +170,7 @@ const i18n = {
   }
 };
 
-// Base Meditation Master Template — Exact User Provided Narrative Meditation
+// Base Meditation Master Template Text
 const BASE_MEDITATION_TEMPLATE = `
 {NAME}, я хочу взять тебя с собой в небольшое путешествие в волшебное место, где мысли становятся реальностью... И чтобы мы смогли туда попасть, нам нужно будет раскрыть свою душу. Так что слушай меня внимательно и давай отправимся в это весёлое путешествие.
 
@@ -240,11 +243,34 @@ const BASE_MEDITATION_TEMPLATE = `
 Открой глаза и улыбнись жизни, и тогда она улыбнется тебе в ответ. Открывай глаза с широкой улыбкой, чувствуя готовность к прекрасному и счастливому дню.
 `;
 
-// Initialize Page Load
+// Initialize Page Load & Audio Player
 document.addEventListener('DOMContentLoaded', () => {
   setupScrollListener();
   registerServiceWorker();
+  initAudioPlayer();
 });
+
+// Initialize Audio Element
+function initAudioPlayer() {
+  appState.audioTrack = new Audio(MEDITATION_AUDIO_SRC);
+
+  appState.audioTrack.addEventListener('timeupdate', () => {
+    if (appState.audioTrack.duration) {
+      const progress = (appState.audioTrack.currentTime / appState.audioTrack.duration) * 100;
+      document.getElementById('player-progress').style.width = `${progress}%`;
+      
+      const currentMin = Math.floor(appState.audioTrack.currentTime / 60);
+      const currentSec = Math.floor(appState.audioTrack.currentTime % 60).toString().padStart(2, '0');
+      document.getElementById('player-time').innerText = `${currentMin}:${currentSec}`;
+    }
+  });
+
+  appState.audioTrack.addEventListener('ended', () => {
+    appState.isPlayingAudio = false;
+    document.getElementById('play-btn').innerText = "▶";
+    document.getElementById('player-progress').style.width = "100%";
+  });
+}
 
 // Switch Language
 function switchLanguage(langKey) {
@@ -323,7 +349,7 @@ function generateEmergencyAudio() {
   `;
 
   document.getElementById('meditation-text-box').innerHTML = `<p><strong>🚨 ЭКСТРЕННОЕ АУДИО ЗАЗЕМЛЕНИЯ:</strong><br><br>${emergencyScript}</p>`;
-  speakTextWithTunedVoice(emergencyScript);
+  playMP3AudioTrack();
 
   logClickAnalytics('EmergencyAudio_Generated', contextInput, 0);
 }
@@ -343,7 +369,7 @@ function toggleVoiceRecord() {
     setTimeout(() => {
       if (appState.isRecording) {
         toggleVoiceRecord();
-        alert("Голос записан! ИИ проанализировал тембр. Сгенерирован персональный рассказ-медитация очень медленным мужским голосом.");
+        alert("Голос записан! ИИ проанализировал тембр. Готов к воспроизведению студийный рассказ-медитация (MP3).");
       }
     }, 4000);
   } else {
@@ -356,7 +382,7 @@ function toggleVoiceRecord() {
   logClickAnalytics('VoiceRecord_Toggled', appState.isRecording ? 'Start' : 'Stop', 0);
 }
 
-// Generate Personal Meditation Text & Audio
+// Generate Personal Meditation Text & Play MP3 Audio Track
 function generatePersonalMeditation() {
   const name = document.getElementById('child-name').value || "София";
   const gender = document.getElementById('child-gender').value;
@@ -377,70 +403,46 @@ function generatePersonalMeditation() {
   document.getElementById('meditation-text-box').innerText = customText;
   document.getElementById('player-title').innerText = `${name} — Рассказ-Медитация`;
   
-  speakTextWithTunedVoice(customText);
+  playMP3AudioTrack();
 
   logClickAnalytics('Meditation_Generated', name, 0);
 }
 
-// Native SpeechSynthesis — VERY SLOW DEEP MALE VOICE (PURE SPEECH, NO MUSIC)
-function speakTextWithTunedVoice(text) {
-  if (!appState.speechSynth) {
-    alert("Ваш браузер не поддерживает встроенный синтез речи.");
-    return;
+// Play Studio Audio Track (meditation1.mp3)
+function playMP3AudioTrack() {
+  if (!appState.audioTrack) {
+    initAudioPlayer();
   }
 
-  appState.speechSynth.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(text);
-
-  // VERY SLOW, MEDITATIVE MALE VOICE SETTINGS
-  utterance.rate = 0.6; // Very slow calm pace
-  utterance.pitch = 0.75; // Calm deep male pitch
-
-  const voices = appState.speechSynth.getVoices();
-  const maleVoice = voices.find(v => (
-    v.name.includes('Male') || 
-    v.name.includes('Pavel') || 
-    v.name.includes('Dmitry') || 
-    v.name.includes('Google русский') || 
-    v.name.includes('David') || 
-    v.name.includes('George')
-  ));
-
-  if (maleVoice) {
-    utterance.voice = maleVoice;
-  }
-
-  utterance.onstart = () => {
-    appState.isPlayingAudio = true;
-    document.getElementById('play-btn').innerText = "⏸";
-    document.getElementById('player-progress').style.width = "30%";
-  };
-
-  utterance.onend = () => {
-    appState.isPlayingAudio = false;
-    document.getElementById('play-btn').innerText = "▶";
-    document.getElementById('player-progress').style.width = "100%";
-  };
-
-  utterance.onerror = () => {
-    appState.isPlayingAudio = false;
-    document.getElementById('play-btn').innerText = "▶";
-  };
-
-  appState.speechSynth.speak(utterance);
-}
-
-function togglePlayAudio() {
-  if (!appState.speechSynth) return;
-
-  if (appState.speechSynth.speaking) {
-    appState.speechSynth.cancel();
+  if (appState.isPlayingAudio) {
+    appState.audioTrack.pause();
     appState.isPlayingAudio = false;
     document.getElementById('play-btn').innerText = "▶";
   } else {
-    generatePersonalMeditation();
+    appState.audioTrack.play().then(() => {
+      appState.isPlayingAudio = true;
+      document.getElementById('play-btn').innerText = "⏸";
+    }).catch(err => {
+      console.warn("Audio playback error, falling back to speech synthesis:", err);
+      // Fallback to SpeechSynthesis if MP3 fails to load
+      speakTextFallback();
+    });
   }
+}
+
+function togglePlayAudio() {
+  playMP3AudioTrack();
+}
+
+// Fallback Speech Synthesis if needed
+function speakTextFallback() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const text = document.getElementById('meditation-text-box').innerText;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.6;
+  utterance.pitch = 0.75;
+  window.speechSynthesis.speak(utterance);
 }
 
 // Pricing Toggle (Monthly vs Annual)
