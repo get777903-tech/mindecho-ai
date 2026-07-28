@@ -510,35 +510,64 @@ function closeAuthModal() {
 }
 
 function simulateSocialAuth(provider) {
-  alert(`Вход через ${provider} выполнен успешно!`);
+  const userId = 'USER-' + Math.floor(100000 + Math.random() * 900000);
+  const sampleName = provider === 'Google' ? 'Google User' : 'Apple User';
+  const sampleEmail = provider.toLowerCase() + '_user@mindecho.ai';
+
+  alert(`🎉 Вход через ${provider} выполнен успешно!\nВаш ID: ${userId}`);
   closeAuthModal();
-  logClickAnalytics('SocialAuth_Success', provider, 0);
+
+  logClickAnalytics('Social_Registration', provider, 0, {
+    user_id: userId,
+    user_name: sampleName,
+    email: sampleEmail,
+    phone: 'Не указан',
+    address: 'Облачный профиль ' + provider,
+    auth_provider: provider
+  });
 }
 
 function handleAuthSubmit(e) {
   e.preventDefault();
+  const userId = 'USER-' + Math.floor(100000 + Math.random() * 900000);
+  const name = document.getElementById('auth-name').value || 'Анонимный пользователь';
   const email = document.getElementById('auth-email').value;
-  const phone = document.getElementById('auth-phone').value;
+  const phone = document.getElementById('auth-phone').value || 'Не указан';
+  const address = document.getElementById('auth-address').value || 'Не указан';
 
-  alert(`Спасибо! Аккаунт (${email}) зарегистрирован.`);
+  alert(`🎉 Спасибо, ${name}! Аккаунт зарегистрирован.\nВаш ID: ${userId}`);
   closeAuthModal();
-  logClickAnalytics('EmailAuth_Registered', email, 0, { phone });
+
+  logClickAnalytics('Email_Registration', 'Email Form', 0, {
+    user_id: userId,
+    user_name: name,
+    email: email,
+    phone: phone,
+    address: address,
+    auth_provider: 'Email/Phone Form'
+  });
 }
 
 // Google Sheets Webhook Click & Onboarding Logger
 function logClickAnalytics(eventType, planName, priceAmount, extraData = {}) {
   const payload = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toLocaleString('ru-RU'),
     event_type: eventType,
     plan_name: planName,
     price: priceAmount,
     language: appState.lang,
     billing_cycle: appState.isAnnualBilling ? 'Annual' : 'Monthly',
     user_agent: navigator.userAgent,
+    user_id: extraData.user_id || 'GUEST',
+    user_name: extraData.user_name || '-',
+    email: extraData.email || '-',
+    phone: extraData.phone || '-',
+    address: extraData.address || '-',
+    auth_provider: extraData.auth_provider || '-',
     ...extraData
   };
 
-  console.log("📊 [MindEcho Analytics] Payload:", payload);
+  console.log("📊 [MindEcho Analytics] Sending Payload to Google Sheets:", payload);
 
   try {
     fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
